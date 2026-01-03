@@ -34,29 +34,37 @@ As opções são:
 def read_csv(path: str) -> List[Dict[str, str]]:
     """read csv file and return list of dictionaries"""
     with open(path, "r") as file:
-        return list(csv.DictReader(file))
+        reader = csv.DictReader(file)
+        return [dict(row) for row in reader]
 
 
 def get_most_instrumental_songs(
-    data: List[Dict[str, str]]
-) -> List[Dict[str, str]]:
-    return sorted(
-        data, key=lambda x: float(x["instrumentalness"]), reverse=True
-    )[:10]
+        data: List[Dict[str, str]]) -> List[Dict[str, str]]:
+    songs = sorted(
+        data, key=lambda x: float(x.get(
+            "Instrumentalness", 0.0)), reverse=True)[:10]
+    for song in songs:
+        song["Instrumentalness"] = float(song["Instrumentalness"])
+    return songs
 
 
 def get_most_danceable_songs(
-    data: List[Dict[str, str]]
-) -> List[Dict[str, str]]:
-    return sorted(data, key=lambda x: float(x["danceability"]), reverse=True)[
-        :10
-    ]
+        data: List[Dict[str, str]]) -> List[Dict[str, str]]:
+    songs = sorted(
+        data, key=lambda x: float(x.get(
+            "Danceability", 0.0)), reverse=True)[:10]
+    for song in songs:
+        song["Danceability"] = float(song["Danceability"])
+    return songs
 
 
 def get_most_energetic_songs(
-    data: List[Dict[str, str]]
-) -> List[Dict[str, str]]:
-    return sorted(data, key=lambda x: float(x["energy"]), reverse=True)[:10]
+        data: List[Dict[str, str]]) -> List[Dict[str, str]]:
+    songs = sorted(data, key=lambda x: float(
+        x.get("Energy", 0.0)), reverse=True)[:10]
+    for song in songs:
+        song["Energy"] = float(song["Energy"])
+    return songs
 
 
 OPTIONS = {
@@ -76,7 +84,7 @@ def handle_user_input(data, option) -> None:
     if option not in OPTIONS:
         print(get_invalid_option_help(option))
         raise ValueError
-    elif isinstance(option, int):
+    else:
         process_music_analysis(data, option)
 
 
@@ -97,6 +105,4 @@ def main(file_path) -> int:
 
 
 if __name__ == "__main__":
-    exit(main(DATA_PATH))
-
-# Initial Commit
+    sys.exit(main(DATA_PATH))
